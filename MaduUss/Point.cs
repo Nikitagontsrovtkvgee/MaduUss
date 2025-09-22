@@ -4,6 +4,7 @@ using System.Diagnostics.SymbolStore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 namespace MaduUss
 {
     class Point
@@ -11,6 +12,18 @@ namespace MaduUss
         public int x;
         public int y;
         public char Sym;
+
+        public Point()
+        {
+
+        }
+
+        public Point(int _x, int _y, char _sym)
+        {
+            x = _x;
+            y = _y;
+            Sym = _sym;
+        }
 
         public void Draw()
         {
