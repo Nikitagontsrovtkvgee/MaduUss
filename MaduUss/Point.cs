@@ -29,7 +29,7 @@ namespace Snake
             y = p.y;
             sym = p.sym;
         }
-
+        const int Y_SCALE = 2;  
         public void Move(int offset, Direction direction)
         {
             if (direction == Direction.RIGHT)
