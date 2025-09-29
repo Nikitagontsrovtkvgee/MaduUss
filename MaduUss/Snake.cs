@@ -1,80 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Snake
+public class Snake
 {
-    class Snake : Figure
+    private List<(int X, int Y)> body;
+    public (int X, int Y) Head => body[0];
+    public Direction CurrentDirection { get; private set; } = Direction.Right;
+    public bool IsActive { get; set; } = true;
+
+    public Snake(int startX, int startY)
     {
-        protected Direction direction;
+        body = new List<(int X, int Y)>();
+        body.Add((startX, startY));
+    }
 
-        public Snake(Point tail, int length, Direction _direction)
+    public void Move()
+    {
+        if (!IsActive) return;
+
+        var newHead = Head;
+        switch (CurrentDirection)
         {
-            direction = _direction;
-            pList = new List<Point>();
-            for (int i = 0; i < length; i++)
-            {
-                Point p = new Point(tail);
-                p.Move(i, direction);
-                pList.Add(p);
-            }
+            case Direction.Up: newHead.Y--; break;
+            case Direction.Down: newHead.Y++; break;
+            case Direction.Left: newHead.X--; break;
+            case Direction.Right: newHead.X++; break;
         }
 
-        public void Move()
-        {
-            Point tail = pList.First();
-            pList.Remove(tail);
-            Point head = GetNextPoint();
-            pList.Add(head);
+        body.Insert(0, newHead);
+        body.RemoveAt(body.Count - 1);
+    }
 
-            tail.Clear();
-            head.Draw();
-        }
+    public void Grow() => body.Add(body[body.Count - 1]);
 
-        public Point GetNextPoint()
-        {
-            Point head = pList.Last();
-            Point nextPoint = new Point(head);
-            nextPoint.Move(1, direction);
-            return nextPoint;
-        }
+    public void ChangeDirection(Direction newDir)
+    {
+        if ((CurrentDirection == Direction.Up && newDir == Direction.Down) ||
+            (CurrentDirection == Direction.Down && newDir == Direction.Up) ||
+            (CurrentDirection == Direction.Left && newDir == Direction.Right) ||
+            (CurrentDirection == Direction.Right && newDir == Direction.Left))
+            return;
 
-        public bool IsHitTail()
-        {
-            var head = pList.Last();
-            for (int i = 0; i < pList.Count - 2; i++)
-            {
-                if (head.IsHit(pList[i]))
-                    return true;
-            }
-            return false;
-        }
+        CurrentDirection = newDir;
+    }
 
-        public void HandleKey(ConsoleKey key)
-        {
-            if (key == ConsoleKey.LeftArrow)
-                direction = Direction.LEFT;
-            else if (key == ConsoleKey.RightArrow)
-                direction = Direction.RIGHT;
-            else if (key == ConsoleKey.DownArrow)
-                direction = Direction.DOWN;
-            else if (key == ConsoleKey.UpArrow)
-                direction = Direction.UP;
-        }
+    public bool CheckCollision(int mapWidth, int mapHeight, List<Enemy> enemies, List<Wall> walls, Snake otherSnake = null)
+    {
+        if (!IsActive) return false;
 
-        public bool Eat(Point food)
-        {
-            Point head = GetNextPoint();
-            if (head.IsHit(food))
-            {
-                food.sym = head.sym;
-                pList.Add(food);
+        if (Head.X < 0 || Head.X >= mapWidth || Head.Y < 0 || Head.Y >= mapHeight)
+            return true;
+
+        for (int i = 1; i < body.Count; i++)
+            if (Head.X == body[i].X && Head.Y == body[i].Y)
                 return true;
-            }
-            else
-                return false;
+
+        if (otherSnake != null && otherSnake.IsActive)
+            foreach (var part in otherSnake.body)
+                if (Head.X == part.X && Head.Y == part.Y)
+                    return true;
+
+        foreach (var e in enemies)
+            if (Head.X == e.X && Head.Y == e.Y)
+                return true;
+
+        foreach (var w in walls)
+            if (Head.X == w.X && Head.Y == w.Y)
+                return true;
+
+        return false;
+    }
+
+    public void Draw()
+    {
+        if (!IsActive) return;
+
+        foreach (var part in body)
+        {
+            Console.SetCursorPosition(part.X, part.Y);
+            Console.Write('O');
         }
     }
 }

@@ -12,28 +12,17 @@ namespace Snake
 
         public void Draw()
         {
-            foreach (Point p in pList)
-            {
-                p.Draw();
-            }
+            foreach (var p in pList) p.Draw();
         }
 
-        internal bool IsHit(Figure figure)
+        public bool IsHit(Figure figure)
         {
             foreach (var p in pList)
             {
-                if (figure.IsHit(p))
-                    return true;
-            }
-            return false;
-        }
-
-        private bool IsHit(Point point)
-        {
-            foreach (var p in pList)
-            {
-                if (p.IsHit(point))
-                    return true;
+                foreach (var fp in figure.pList)
+                {
+                    if (p.IsHit(fp)) return true;
+                }
             }
             return false;
         }

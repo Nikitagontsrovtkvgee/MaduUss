@@ -1,17 +1,15 @@
 ﻿using System;
 
-public class Wall
+public class Enemy
 {
     public int X { get; set; }
     public int Y { get; set; }
-    public char Symbol { get; set; } = '#';
-    public int Duration { get; set; }
+    public char Symbol { get; set; } = 'E';
 
-    public Wall(int x, int y, int duration = 5)
+    public Enemy(int x, int y)
     {
         X = x;
         Y = y;
-        Duration = duration;
     }
 
     public void Draw()
