@@ -1,30 +1,32 @@
 ﻿using System;
+using System.Collections.Generic;
 
-public class Bonus
+namespace SnakeGame
 {
-    public int X { get; set; }
-    public int Y { get; set; }
-    public char Symbol { get; set; } = 'B';
-    public int Duration { get; set; }
-    public bool IsSpawnSecondSnake { get; set; } = false; // для бонуса, который вызывает вторую змейку
-
-    public Bonus(int x, int y, int duration = 10, bool spawnSecond = false)
+    // Класс бонуса
+    public class Bonus
     {
-        X = x;
-        Y = y;
-        Duration = duration;
-        IsSpawnSecondSnake = spawnSecond;
+        public Position Pos { get; private set; }
+        public char Symbol { get; private set; }
+        public int Duration { get; private set; } // Время жизни бонуса в тиках
+
+        public Bonus(Position pos, char symbol, int duration)
+        {
+            Pos = pos;
+            Symbol = symbol;
+            Duration = duration;
+        }
+
+        // Уменьшение времени жизни
+        public void Tick()
+        {
+            Duration--;
+        }
+
+        public bool IsExpired()
+        {
+            return Duration <= 0;
+        }
     }
 
-    public void Draw()
-    {
-        Console.SetCursorPosition(X, Y);
-        Console.Write(Symbol);
-    }
-
-    public void Clear()
-    {
-        Console.SetCursorPosition(X, Y);
-        Console.Write(' ');
-    }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Snake
+namespace SnakeGame
 {
     class Bomb : Figure
     {
@@ -15,15 +15,15 @@ namespace Snake
 
         public void MoveTowards(Snake snake)
         {
-            Point head = snake.GetNextPoint();
+            Position head = snake.GetHead();
             Point p = pList[0];
 
             // догоняем змейку
-            if (p.x < head.x) p.x++;
-            else if (p.x > head.x) p.x--;
+            if (p.x < head.X) p.x++;
+            else if (p.x > head.X) p.x--;
 
-            if (p.y < head.y) p.y++;
-            else if (p.y > head.y) p.y--;
+            if (p.y < head.Y) p.y++;
+            else if (p.y > head.Y) p.y--;
 
             Draw();
         }

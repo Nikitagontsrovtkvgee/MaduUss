@@ -1,6 +1,8 @@
-﻿using System.Media;
+﻿using System;
+using System.Collections.Generic;
+using System.Media;
 
-namespace Snake
+namespace SnakeGame
 {
     class SoundManager
     {

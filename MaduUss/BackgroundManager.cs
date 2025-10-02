@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace Snake
+namespace SnakeGame
 {
     class BackgroundManager
     {

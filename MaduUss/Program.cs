@@ -2,115 +2,117 @@
 using System.Collections.Generic;
 using System.Threading;
 
-class Program
+namespace SnakeGame
 {
-    static void Main()
+    class Program
     {
-        int mapWidth = 40;
-        int mapHeight = 20;
-        Snake snake1 = new Snake(10, 10);
-        Snake snake2 = new Snake(5, 5) { IsActive = false }; // появляется только после бонуса
-
-        List<Bonus> bonuses = new List<Bonus>();
-        List<Enemy> enemies = new List<Enemy>();
-        List<Wall> walls = new List<Wall>();
-
-        bool gameOver = false;
-        Random rnd = new Random();
-
-        while (!gameOver)
+        static void Main()
         {
-            if (Console.KeyAvailable)
-            {
-                var key = Console.ReadKey(true).Key;
-                switch (key)
-                {
-                    case ConsoleKey.UpArrow: snake1.ChangeDirection(Direction.Up); break;
-                    case ConsoleKey.DownArrow: snake1.ChangeDirection(Direction.Down); break;
-                    case ConsoleKey.LeftArrow: snake1.ChangeDirection(Direction.Left); break;
-                    case ConsoleKey.RightArrow: snake1.ChangeDirection(Direction.Right); break;
+            Console.CursorVisible = false;
 
-                    case ConsoleKey.W: snake2.ChangeDirection(Direction.Up); break;
-                    case ConsoleKey.S: snake2.ChangeDirection(Direction.Down); break;
-                    case ConsoleKey.A: snake2.ChangeDirection(Direction.Left); break;
-                    case ConsoleKey.D: snake2.ChangeDirection(Direction.Right); break;
+            int mapWidth = 40;
+            int mapHeight = 20;
+
+            Snake player = new Snake(new Position(mapWidth / 2, mapHeight / 2), Direction.Right, 3);
+
+            List<Bonus> bonuses = new List<Bonus>();
+            Random random = new Random();
+
+            int tick = 0;
+            bool gameOver = false;
+
+            while (!gameOver)
+            {
+                // === 1. Управление ===
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKey key = Console.ReadKey(true).Key;
+                    switch (key)
+                    {
+                        case ConsoleKey.UpArrow: player.SetDirection(Direction.Up); break;
+                        case ConsoleKey.DownArrow: player.SetDirection(Direction.Down); break;
+                        case ConsoleKey.LeftArrow: player.SetDirection(Direction.Left); break;
+                        case ConsoleKey.RightArrow: player.SetDirection(Direction.Right); break;
+                    }
                 }
+
+                // === 2. Двигаем змейку ===
+                player.Move();
+
+                // Проверка столкновения с самим собой
+                if (player.CheckSelfCollision())
+                {
+                    gameOver = true;
+                    break;
+                }
+
+                // === 3. Спавн бонусов с задержкой ===
+                if (tick % 20 == 0) // каждые 20 тиков
+                {
+                    int x = random.Next(1, mapWidth - 1);
+                    int y = random.Next(1, mapHeight - 1);
+                    bonuses.Add(new Bonus(new Position(x, y), '*', 30)); // бонус живет 30 тиков
+                }
+
+                // Убираем истекшие бонусы
+                bonuses.RemoveAll(b => b.IsExpired());
+
+                foreach (var bonus in bonuses)
+                    bonus.Tick();
+
+                // === 4. Проверка на съеденный бонус ===
+                foreach (var bonus in bonuses.ToArray())
+                {
+                    if (player.Body[0].Equals(bonus.Pos))
+                    {
+                        player.Grow();
+                        bonuses.Remove(bonus);
+                    }
+                }
+
+                // === 5. Отрисовка ===
+                Console.Clear();
+
+                // Рисуем границы
+                for (int x = 0; x < mapWidth; x++)
+                {
+                    Console.SetCursorPosition(x, 0);
+                    Console.Write("#");
+                    Console.SetCursorPosition(x, mapHeight - 1);
+                    Console.Write("#");
+                }
+                for (int y = 0; y < mapHeight; y++)
+                {
+                    Console.SetCursorPosition(0, y);
+                    Console.Write("#");
+                    Console.SetCursorPosition(mapWidth - 1, y);
+                    Console.Write("#");
+                }
+
+                // Рисуем змейку
+                foreach (var part in player.Body)
+                {
+                    Console.SetCursorPosition(part.X, part.Y);
+                    Console.Write("O");
+                }
+
+                // Рисуем бонусы
+                foreach (var bonus in bonuses)
+                {
+                    Console.SetCursorPosition(bonus.Pos.X, bonus.Pos.Y);
+                    Console.Write(bonus.Symbol);
+                }
+
+                // === 6. Задержка игры ===
+                Thread.Sleep(150);
+                tick++;
             }
 
-            // Спавн бонусов
-            if (rnd.Next(0, 20) == 0)
-            {
-                bool spawnSecond = rnd.Next(0, 5) == 0; // шанс 1 к 5
-                bonuses.Add(new Bonus(rnd.Next(0, mapWidth), rnd.Next(0, mapHeight), 10, spawnSecond));
-            }
-
-            // Спавн врагов
-            if (rnd.Next(0, 50) == 0)
-                enemies.Add(new Enemy(rnd.Next(0, mapWidth), rnd.Next(0, mapHeight)));
-
-            // Спавн стен
-            if (rnd.Next(0, 50) == 0)
-                walls.Add(new Wall(rnd.Next(0, mapWidth), rnd.Next(0, mapHeight), 5));
-
-            // Очистка бонусов и стен
-            for (int i = bonuses.Count - 1; i >= 0; i--)
-            {
-                bonuses[i].Duration--;
-                if (bonuses[i].Duration <= 0)
-                {
-                    bonuses[i].Clear();
-                    bonuses.RemoveAt(i);
-                }
-            }
-
-            for (int i = walls.Count - 1; i >= 0; i--)
-            {
-                walls[i].Duration--;
-                if (walls[i].Duration <= 0)
-                {
-                    walls[i].Clear();
-                    walls.RemoveAt(i);
-                }
-            }
-
-            // Движение змей
-            snake1.Move();
-            snake2.Move();
-
-            // Проверка столкновений с бонусами
-            for (int i = bonuses.Count - 1; i >= 0; i--)
-            {
-                if ((snake1.Head.X == bonuses[i].X && snake1.Head.Y == bonuses[i].Y))
-                {
-                    snake1.Grow();
-                    if (bonuses[i].IsSpawnSecondSnake) snake2.IsActive = true;
-                    bonuses[i].Clear();
-                    bonuses.RemoveAt(i);
-                }
-                else if (snake2.IsActive && snake2.Head.X == bonuses[i].X && snake2.Head.Y == bonuses[i].Y)
-                {
-                    snake2.Grow();
-                    bonuses[i].Clear();
-                    bonuses.RemoveAt(i);
-                }
-            }
-
-            // Отрисовка
+            // === Конец игры ===
             Console.Clear();
-            snake1.Draw();
-            snake2.Draw();
-            foreach (var b in bonuses) b.Draw();
-            foreach (var e in enemies) e.Draw();
-            foreach (var w in walls) w.Draw();
-
-            // Проверка столкновений
-            gameOver = snake1.CheckCollision(mapWidth, mapHeight, enemies, walls, snake2) ||
-                       snake2.CheckCollision(mapWidth, mapHeight, enemies, walls, snake1);
-
-            Thread.Sleep(200);
+            Console.SetCursorPosition(mapWidth / 2 - 4, mapHeight / 2);
+            Console.WriteLine("GAME OVER!");
+            Console.ReadKey();
         }
-
-        Console.SetCursorPosition(0, mapHeight + 1);
-        Console.WriteLine("Game Over!");
     }
 }
