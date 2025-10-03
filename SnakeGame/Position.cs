@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-namespace SnakeGame
+﻿namespace SnakeGame
 {
+    // Punkt kaardil
     public class Position
     {
         public int X { get; set; }
@@ -13,7 +12,7 @@ namespace SnakeGame
             Y = y;
         }
 
-        // Сравнение двух позиций
+        // Võrdlus teise positsiooniga
         public bool Equals(Position other)
         {
             return other != null && X == other.X && Y == other.Y;
