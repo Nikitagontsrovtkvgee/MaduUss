@@ -1,6 +1,7 @@
-﻿namespace SnakeGame
+﻿using System;
+
+namespace SnakeGame
 {
-    // Punkt klass
     public class Point
     {
         public int X { get; set; }
@@ -12,9 +13,12 @@
             Y = y;
         }
 
-        public bool Equals(Point other)
+        public override bool Equals(object obj)
         {
-            return other != null && X == other.X && Y == other.Y;
+            if (obj is not Point other) return false;
+            return X == other.X && Y == other.Y;
         }
+
+        public override int GetHashCode() => HashCode.Combine(X, Y);
     }
 }

@@ -2,18 +2,22 @@
 
 namespace SnakeGame
 {
-    // Taustahaldur (värvid, eriefektid)
     public static class BackgroundManager
     {
-        public static void ClearScreen()
+        public static void DrawBackground(int width, int height)
         {
             Console.Clear();
-        }
-
-        public static void SetBackground(ConsoleColor color)
-        {
-            Console.BackgroundColor = color;
-            Console.Clear();
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (y == 0 || y == height - 1 || x == 0 || x == width - 1)
+                        Console.Write("#");
+                    else
+                        Console.Write(" ");
+                }
+                Console.WriteLine();
+            }
         }
     }
 }

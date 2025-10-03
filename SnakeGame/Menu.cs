@@ -2,30 +2,32 @@
 
 namespace SnakeGame
 {
-    // Menüü klass
     public static class Menu
     {
-        public static void Show()
+        public static int ShowMenu()
         {
             Console.Clear();
-            Console.WriteLine("=== Madu Mäng ===");
-            Console.WriteLine("1. Mängi");
-            Console.WriteLine("2. Punktid");
-            Console.WriteLine("3. Legend (boosterid ja tähendused)");
-            Console.WriteLine("4. Välju");
+            Console.WriteLine("=== MÄNGU MENÜÜ ===");
+            Console.WriteLine("1 - Alusta mängu");
+            Console.WriteLine("2 - Näita tabeleid");
+            Console.WriteLine("3 - Lõpeta");
+            Console.WriteLine("4 - Legend (boonused)");
+
+            int choice = 1;
+            try { choice = int.Parse(Console.ReadLine() ?? "1"); } catch { choice = 1; }
+            return choice;
         }
 
         public static void ShowLegend()
         {
             Console.Clear();
-            Console.WriteLine("=== Boosterite Legend ===");
-            Console.WriteLine("* - Tavaline õun");
-            Console.WriteLine("B - Booster madu");
-            Console.WriteLine("F - Pommi freeze booster");
-            Console.WriteLine("D - Topelt punktid");
-            Console.WriteLine("M - Magnet");
-            Console.WriteLine("C - Lõigatud saba");
-            Console.WriteLine("Tagasi menüüsse vajuta Enter");
+            Console.WriteLine("=== LEGEND (Boonused) ===");
+            Console.WriteLine("B - Booster (aktiviseerib täiendava madu)");
+            Console.WriteLine("* - Tavaline toidupunkt");
+            Console.WriteLine("X - Booster madu keha");
+            Console.WriteLine("! - Booster madu pea");
+            Console.WriteLine("B (pommi puhul) - Bomb");
+            Console.WriteLine("\nVajuta suvalist klahvi tagasi minemiseks.");
             Console.ReadKey();
         }
     }

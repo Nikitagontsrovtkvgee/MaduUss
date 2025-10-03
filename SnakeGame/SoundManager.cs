@@ -1,27 +1,37 @@
-﻿using System.Media;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace SnakeGame
 {
-    // Heli mängija klass
-    public class SoundManager
+    public class ScoreManager
     {
-        private SoundPlayer eatPlayer;
-        private SoundPlayer gameOverPlayer;
+        private const string fileName = "scores.txt";
 
-        public SoundManager()
+        public void SaveResult(string name, int points)
         {
-            eatPlayer = new SoundPlayer("eat.wav");
-            gameOverPlayer = new SoundPlayer("gameover.wav");
+            File.AppendAllText(fileName, $"{name}:{points}\n");
         }
 
-        public void PlayEat()
+        public void ShowResults(int top)
         {
-            eatPlayer.Play();
-        }
+            if (!File.Exists(fileName)) return;
 
-        public void PlayGameOver()
-        {
-            gameOverPlayer.Play();
+            var lines = File.ReadAllLines(fileName);
+            var scores = new List<(string, int)>();
+
+            foreach (var line in lines)
+            {
+                var parts = line.Split(':');
+                if (parts.Length == 2 && int.TryParse(parts[1], out int pts))
+                    scores.Add((parts[0], pts));
+            }
+
+            var topScores = scores.OrderByDescending(s => s.Item2).Take(top);
+            Console.WriteLine("== Tabel ==");
+            foreach (var s in topScores)
+                Console.WriteLine($"{s.Item1} - {s.Item2}");
         }
     }
 }

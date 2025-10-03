@@ -2,10 +2,18 @@
 
 namespace SnakeGame
 {
-    // Vertikaaljoon (näiteks kaartidele)
     public class VerticalLine
     {
-        public void Draw(int x, int yStart, int yEnd)
+        private int x, yStart, yEnd;
+
+        public VerticalLine(int x, int yStart, int yEnd)
+        {
+            this.x = x;
+            this.yStart = yStart;
+            this.yEnd = yEnd;
+        }
+
+        public void Draw()
         {
             for (int y = yStart; y <= yEnd; y++)
             {

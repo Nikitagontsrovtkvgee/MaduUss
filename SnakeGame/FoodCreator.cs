@@ -2,20 +2,18 @@
 
 namespace SnakeGame
 {
-    // Toidu (õun) generaator
     public class FoodCreator
     {
         private int mapWidth;
         private int mapHeight;
-        private char symbol;
-        private Random random;
+        private char sym;
+        private Random random = new Random();
 
-        public FoodCreator(int width, int height, char sym)
+        public FoodCreator(int mapWidth, int mapHeight, char sym)
         {
-            mapWidth = width;
-            mapHeight = height;
-            symbol = sym;
-            random = new Random();
+            this.mapWidth = mapWidth;
+            this.mapHeight = mapHeight;
+            this.sym = sym;
         }
 
         public Position CreateFood()
@@ -25,9 +23,6 @@ namespace SnakeGame
             return new Position(x, y);
         }
 
-        public char GetSymbol()
-        {
-            return symbol;
-        }
+        public char Symbol() => sym;
     }
 }

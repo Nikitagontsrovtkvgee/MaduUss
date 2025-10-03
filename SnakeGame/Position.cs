@@ -1,6 +1,6 @@
 ﻿namespace SnakeGame
 {
-    // Punkt kaardil
+    // Määrab koordinaadi punkt
     public class Position
     {
         public int X { get; set; }
@@ -12,10 +12,14 @@
             Y = y;
         }
 
-        // Võrdlus teise positsiooniga
         public bool Equals(Position other)
         {
             return other != null && X == other.X && Y == other.Y;
+        }
+
+        public Position Copy()
+        {
+            return new Position(X, Y);
         }
     }
 }

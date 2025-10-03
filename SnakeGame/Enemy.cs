@@ -2,33 +2,42 @@
 
 namespace SnakeGame
 {
-    // Vaenlase (bomber) liikumine
-    public class Enemy
+    // Vaenlane – liikuva madu baasklass
+    public class Enemy : Snake
     {
         private Random random = new Random();
-        public Position Pos { get; private set; }
-        private int mapWidth;
-        private int mapHeight;
 
-        public Enemy(int width, int height)
+        public Enemy(Position startPos, Direction dir, int length)
+            : base(startPos, dir, length)
         {
-            mapWidth = width;
-            mapHeight = height;
-            Pos = new Position(random.Next(1, width - 1), random.Next(1, height - 1));
         }
 
-        public void Move()
+        // Liikumine juhuslikult või peegeldusmoodis
+        public void MoveRandom(int width, int height)
         {
-            int dx = random.Next(-1, 2);
-            int dy = random.Next(-1, 2);
+            Direction dir = (Direction)random.Next(0, 4);
+            SetDirection(dir);
 
-            Pos.X += dx;
-            Pos.Y += dy;
+            Move();
 
-            if (Pos.X <= 0) Pos.X = 1;
-            if (Pos.X >= mapWidth - 1) Pos.X = mapWidth - 2;
-            if (Pos.Y <= 0) Pos.Y = 1;
-            if (Pos.Y >= mapHeight - 1) Pos.Y = mapHeight - 2;
+            // Kontroll piiride vastu
+            Position head = GetHead();
+            if (head.X <= 0) head.X = 1;
+            if (head.X >= width - 1) head.X = width - 2;
+            if (head.Y <= 0) head.Y = 1;
+            if (head.Y >= height - 1) head.Y = height - 2;
+        }
+
+        // Kas vaenlane tabas mängijat
+        public bool CheckCollision(Snake player)
+        {
+            Position head = GetHead();
+            foreach (var part in player.Body)
+            {
+                if (head.Equals(part))
+                    return true;
+            }
+            return false;
         }
     }
 }

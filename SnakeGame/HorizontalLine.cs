@@ -2,10 +2,18 @@
 
 namespace SnakeGame
 {
-    // Horisontaaljoon (näiteks kaartidele)
     public class HorizontalLine
     {
-        public void Draw(int y, int xStart, int xEnd)
+        private int y, xStart, xEnd;
+
+        public HorizontalLine(int y, int xStart, int xEnd)
+        {
+            this.y = y;
+            this.xStart = xStart;
+            this.xEnd = xEnd;
+        }
+
+        public void Draw()
         {
             for (int x = xStart; x <= xEnd; x++)
             {

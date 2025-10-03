@@ -2,10 +2,18 @@
 
 namespace SnakeGame
 {
-    // Seinte joonistamine
-    public static class Walls
+    public class Walls
     {
-        public static void Draw(int width, int height)
+        private int width;
+        private int height;
+
+        public Walls(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+        }
+
+        public void Draw()
         {
             for (int x = 0; x < width; x++)
             {
@@ -17,6 +25,11 @@ namespace SnakeGame
                 Console.SetCursorPosition(0, y); Console.Write("#");
                 Console.SetCursorPosition(width - 1, y); Console.Write("#");
             }
+        }
+
+        public bool CheckCollision(Position pos)
+        {
+            return pos.X <= 0 || pos.X >= width - 1 || pos.Y <= 0 || pos.Y >= height - 1;
         }
     }
 }
