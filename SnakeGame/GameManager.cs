@@ -14,6 +14,8 @@ namespace SnakeGame
         private Bomb bomb;
         private List<Bonus> bonuses;
         private Random random;
+        private ScoreManager scoreManager;
+        private SoundManager soundManager;
 
         public GameManager(int width, int height)
         {
@@ -22,6 +24,8 @@ namespace SnakeGame
             random = new Random();
             bonuses = new List<Bonus>();
             booster = null;
+            scoreManager = new ScoreManager();
+            soundManager = new SoundManager();
         }
 
         public void RunGame()
@@ -35,6 +39,7 @@ namespace SnakeGame
             try { difficulty = int.Parse(Console.ReadLine() ?? "2"); } catch { difficulty = 2; }
 
             player = new Snake(new Position(mapWidth / 2, mapHeight / 2), Direction.Right, 3);
+            soundManager.PlayStart();
 
             while (!gameOver)
             {
@@ -42,7 +47,10 @@ namespace SnakeGame
                 player.Move();
 
                 if (player.CheckSelfCollision() || player.CheckWallCollision(mapWidth, mapHeight))
+                {
+                    soundManager.PlayGameOver();
                     gameOver = true;
+                }
 
                 SpawnBonuses(tick);
                 UpdateBonuses();
@@ -103,13 +111,20 @@ namespace SnakeGame
                 {
                     player.Grow();
                     bonuses.Remove(bonus);
+                    soundManager.PlayBonus();
 
                     if (bonus.Symbol == 'B')
                     {
-                        booster = new Snake(new Position(random.Next(2, mapWidth - 2),
-                                                         random.Next(2, mapHeight - 2)), Direction.Right, 2);
+                        booster = new Snake(
+                            new Position(random.Next(2, mapWidth - 2),
+                                         random.Next(2, mapHeight - 2)),
+                            Direction.Right, 2);
+
                         booster.ActivateBooster();
                         boosterDuration = 30;
+
+                        soundManager.PlayBooster();
+
                         Console.SetCursorPosition(booster.Body[0].X, booster.Body[0].Y);
                         Console.Write("!");
                     }
@@ -127,7 +142,8 @@ namespace SnakeGame
                 if (booster.CheckWallCollision(mapWidth, mapHeight) || booster.IsHit(player))
                     booster = null;
 
-                if (boosterDuration <= 0) booster = null;
+                if (boosterDuration <= 0)
+                    booster = null;
             }
         }
 
@@ -136,6 +152,7 @@ namespace SnakeGame
             if (bomb == null && random.Next(0, 50) == 0)
             {
                 bomb = new Bomb(random.Next(2, mapWidth - 2), random.Next(2, mapHeight - 2), 'X', difficulty);
+                soundManager.PlayBombSpawn();
             }
         }
 
@@ -145,7 +162,10 @@ namespace SnakeGame
             {
                 bomb.Move(player, mapWidth, mapHeight);
                 if (bomb.IsHitSnake(player))
+                {
+                    soundManager.PlayExplosion();
                     bomb = null;
+                }
             }
         }
 
@@ -218,9 +238,11 @@ namespace SnakeGame
                 name = Console.ReadLine() ?? "";
             }
 
-            ScoreManager scoreManager = new ScoreManager();
-            scoreManager.SaveResult(name, player.Body.Count - 3);
+            int score = player.Body.Count - 3;
+            scoreManager.SaveResult(name, score);
             scoreManager.ShowResults(10);
+
+            soundManager.PlayEnd();
 
             Console.ReadKey();
         }

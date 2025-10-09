@@ -1,37 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace SnakeGame
 {
     public class ScoreManager
     {
-        private const string fileName = "scores.txt";
+        private readonly string _scoreFilePath;
+        private readonly List<(string Player, int Score)> _scores = new();
 
-        public void SaveResult(string name, int points)
+        public ScoreManager(string filePath = "scores.txt")
         {
-            File.AppendAllText(fileName, $"{name}:{points}\n");
+            _scoreFilePath = filePath;
+            LoadResults();
         }
 
-        public void ShowResults(int top)
+        /// <summary>
+        /// Сохранить результат игрока в файл.
+        /// </summary>
+        public void SaveResult(string playerName, int score)
         {
-            if (!File.Exists(fileName)) return;
-
-            var lines = File.ReadAllLines(fileName);
-            var scores = new List<(string, int)>();
-
-            foreach (var line in lines)
+            _scores.Add((playerName, score));
+            try
             {
-                var parts = line.Split(':');
-                if (parts.Length == 2 && int.TryParse(parts[1], out int pts))
-                    scores.Add((parts[0], pts));
+                using StreamWriter writer = new StreamWriter(_scoreFilePath, append: true);
+                writer.WriteLine($"{playerName}:{score}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при сохранении счёта: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Загрузить результаты из файла.
+        /// </summary>
+        private void LoadResults()
+        {
+            if (!File.Exists(_scoreFilePath))
+                return;
+
+            try
+            {
+                foreach (var line in File.ReadAllLines(_scoreFilePath))
+                {
+                    var parts = line.Split(':');
+                    if (parts.Length == 2 && int.TryParse(parts[1], out int score))
+                    {
+                        _scores.Add((parts[0], score));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при загрузке счёта: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Отобразить результаты игроков.
+        /// </summary>
+        public void ShowResults()
+        {
+            Console.Clear();
+            Console.WriteLine("=== Таблица результатов ===\n");
+
+            if (_scores.Count == 0)
+            {
+                Console.WriteLine("Пока нет сохранённых результатов.");
+            }
+            else
+            {
+                int rank = 1;
+                foreach (var (player, score) in _scores)
+                {
+                    Console.WriteLine($"{rank}. {player} — {score}");
+                    rank++;
+                }
             }
 
-            var topScores = scores.OrderByDescending(s => s.Item2).Take(top);
-            Console.WriteLine("== Tabel ==");
-            foreach (var s in topScores)
-                Console.WriteLine($"{s.Item1} - {s.Item2}");
+            Console.WriteLine("\nНажмите любую клавишу для выхода...");
+            Console.ReadKey(true);
         }
     }
 }

@@ -1,37 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Media;
 
 namespace SnakeGame
 {
-    public class ScoreManager
+    public class SoundManager
     {
-        private const string fileName = "scores.txt";
+        private readonly SoundPlayer _eatSound;
+        private readonly SoundPlayer _gameOverSound;
 
-        public void SaveResult(string name, int points)
+        public SoundManager()
         {
-            File.AppendAllText(fileName, $"{name}:{points}\n");
+            // Укажи свои пути, если файлы находятся в другой папке:
+            _eatSound = new SoundPlayer("eat.wav");
+            _gameOverSound = new SoundPlayer("gameover.wav");
         }
 
-        public void ShowResults(int top)
+        /// <summary>
+        /// Воспроизвести звук, когда змейка ест еду.
+        /// </summary>
+        public void PlayEatSound()
         {
-            if (!File.Exists(fileName)) return;
-
-            var lines = File.ReadAllLines(fileName);
-            var scores = new List<(string, int)>();
-
-            foreach (var line in lines)
+            try
             {
-                var parts = line.Split(':');
-                if (parts.Length == 2 && int.TryParse(parts[1], out int pts))
-                    scores.Add((parts[0], pts));
+                _eatSound.Play();
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка воспроизведения звука еды: {ex.Message}");
+            }
+        }
 
-            var topScores = scores.OrderByDescending(s => s.Item2).Take(top);
-            Console.WriteLine("== Tabel ==");
-            foreach (var s in topScores)
-                Console.WriteLine($"{s.Item1} - {s.Item2}");
+        /// <summary>
+        /// Воспроизвести звук при проигрыше.
+        /// </summary>
+        public void PlayGameOverSound()
+        {
+            try
+            {
+                _gameOverSound.Play();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка воспроизведения звука окончания игры: {ex.Message}");
+            }
         }
     }
 }
